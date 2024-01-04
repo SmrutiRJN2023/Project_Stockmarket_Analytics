@@ -1,0 +1,100 @@
+USE project_stockmarket_1;
+CREATE TABLE stock_market
+(
+Date1 DATE,
+Day1 VARCHAR(255),
+Month1 VARCHAR(255),
+Year1 VARCHAR(255),
+Ticker  VARCHAR(255),
+Open DECIMAL(6,2),
+High DECIMAL(6,2),
+Low DECIMAL(6,2),
+Close DECIMAL(6,2),
+Volume INT,
+Adjusted_Close DECIMAL(6,2),
+Dividend_Amount DECIMAL(6,2),
+Stock_Split INT,
+Moving_Average DECIMAL(6,2),
+RSI DECIMAL(6,2),
+MACD  DECIMAL(6,2),
+Bollinger_BandUpper DECIMAL(6,2),
+Bollinger_BandLower  DECIMAL(6,2),
+52_Week_High DECIMAL(6,2),
+52_Week_Low DECIMAL(6,2),
+Beta DECIMAL(6,2),
+Market_Cap VARCHAR(255),
+PE_Ratio DECIMAL(6,2)
+);
+SELECT * FROM stock_market;
+LOAD DATA INFILE'C:/ProgramData/MySQL/MySQL Server 8.0/stock_market3.CSV' INTO TABLE stock_market
+FIELDS TERMINATED BY ','
+IGNORE 1 LINES;
+SELECT * FROM stock_market;
+ALTER TABLE stock_market CHANGE COLUMN Ticker  Stocks VARCHAR(255);
+SELECT * FROM stock_market;
+
+
+-- AVERAGE DAILY TRADING VOLUME --
+CREATE TABLE KPI_1 (Ticker VARCHAR(55),Volume INT);
+SELECT * FROM KPI_1;
+INSERT INTO KPI_1 SELECT Ticker,Volume FROM stock_market;
+SELECT Ticker AS Stocks,ROUND(AVG(Volume),2) AS Average_Volume FROM KPI_1 GROUP BY Ticker ORDER BY Average_Volume DESC;
+
+
+-- MOST VOLATILE STOCKS --
+CREATE TABLE KPI_2 (Ticker VARCHAR(55),Beta DECIMAL(6,2));
+SELECT * FROM KPI_2;
+INSERT INTO KPI_2 SELECT Ticker,Beta FROM stock_market;
+SELECT Ticker AS Stocks,AVG(Beta) AS Average_Beta FROM KPI_2 GROUP BY Ticker ORDER BY Average_Beta DESC;
+
+-- STOCKS WITH HIGHEST AND LOWEST DIVIDEND AMOUNT --
+CREATE TABLE KPI_3 (Ticker VARCHAR(55),Dividend_Amount DECIMAL(6,2));
+SELECT * FROM KPI_3;
+INSERT INTO KPI_3 SELECT Ticker,Dividend_Amount FROM stock_market;
+SELECT Ticker AS Stocks,SUM(Dividend_Amount) AS Total_Dividend FROM KPI_3 GROUP BY Ticker ORDER BY Total_Dividend DESC;
+
+-- STOCKS WITH HIGHEST AND LOWEST PE RATIO --
+CREATE TABLE KPI_4 (Ticker VARCHAR(55),PE_Ratio DECIMAL(6,2));
+SELECT * FROM KPI_4;
+INSERT INTO KPI_4 SELECT Ticker,PE_Ratio FROM stock_market;
+SELECT Ticker AS Stocks, MAX(PE_Ratio) AS MAX_PE_Ratio,MIN(PE_Ratio) AS MIN_PE_Ratio FROM KPI_4 GROUP BY Ticker ORDER BY MAX_PE_Ratio DESC;
+
+-- STOCKS WITH MARKET CAP --
+CREATE TABLE KPI_5 (Ticker VARCHAR(55),Market_Cap VARCHAR(55));
+SELECT * FROM KPI_5;
+INSERT INTO KPI_5 SELECT Ticker,Market_Cap FROM stock_market;
+SELECT Ticker AS Stocks,ROUND(AVG(Market_Cap),0) AS Average_Market_Cap FROM KPI_5 GROUP BY Ticker ORDER BY Average_Market_Cap DESC;
+
+-- STOCKS WITH STRONG BUY AND SELL SIGNAL --
+CALL stock_market ('August','2023','FB');
+CALL stock_market ('August','2023','AMZN');
+CALL stock_market ('August','2023','MSFT');
+CALL stock_market ('August','2023','AAPL');
+CALL stock_market ('August','2023','GOOGL');
+
+-- STOCKS WITH STRONG BUY AND SELL SIGNAL --
+CREATE TABLE KPI_6 (Ticker VARCHAR(55),RSI DECIMAL (4,2) ,MACD DECIMAL (5,2));
+SELECT * FROM KPI_6;
+INSERT INTO KPI_6 SELECT Ticker,RSI,MACD FROM stock_market; 
+SELECT Ticker,ROUND(AVG(RSI),2) AS Average_RSI,ROUND(AVG(MACD),2) AS Average_MACD FROM KPI_6 GROUP BY Ticker ORDER BY Average_MACD DESC;
+
+-- STOCKS WITH STRONG BUY AND SELL SIGNAL --
+CREATE TABLE KPI_7 ( Day1 VARCHAR(55),Month1 VARCHAR(55),Year1 VARCHAR(55),Ticker  VARCHAR(55),RSI DECIMAL(6,2),MACD DECIMAL(6,2));
+SELECT * FROM KPI_7;
+INSERT INTO KPI_7 SELECT Day1,Month1,Year1,Ticker,RSI,MACD FROM stock_market;
+SELECT Day1,Month1,Year1,Ticker AS Stocks, SUM(RSI), SUM(MACD) FROM KPI_7 GROUP BY Day1,Month1,Year1,Ticker;
+
+
+
+
+
+
+
+CREATE TABLE KPI_8 (Stocks VARCHAR(55));
+SELECT * FROM KPI_8;
+INSERT INTO KPI_8 SELECT  Stocks FROM stock_market;
+SELECT DISTINCT Stocks FROM stock_market;
+
+
+
+
